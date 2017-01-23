@@ -108,6 +108,7 @@ class FFT_Plugin(Plugin):
 
         def on_ffts_complete():
             for fs in fftsignals:
+                fs.data = np.abs(fs.data)
                 fs.plot()
                 sw = self.ui.lut_signalwrapper[fs]
                 if on_complete is not None:
@@ -146,10 +147,13 @@ class FFT_Plugin(Plugin):
                     if inverse:
                         axis.scale = 1 / (s_axis.size * s_axis.scale)
                     u = s_axis.units
-                    if u.endswith('-1'):
-                        u = u[:-2]
+                    if str(u.__class__) == "<class 'traits.trait_base._Undefined'>":
+                        u = u.__repr__() + '-1'
                     else:
-                        u += '-1'
+                        if u.endswith('-1'):
+                            u = u[:-2]
+                        else:
+                            u += '-1'
                     axis.units = u
                 fftsignals.append(ffts)
                 yield i + 1
